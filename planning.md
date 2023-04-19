@@ -1,6 +1,7 @@
 # Party planner
 ## Descripción
 Es un sistema que se encargará tanto de organizar como de invitar y hacer participe a gente en fiestas, reuniones, etc. Un organizador crea la fiesta, invita a la gente correspondiente y el sistema se encarga de llevar un presupuesto y lista de invitados conforme se vayan aceptando las invitaciones.
+Si.
 
 ## Vistas principales
 ### Home
