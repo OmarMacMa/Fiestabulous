@@ -689,6 +689,57 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/auth/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        if not request.form or not 'email' in request.form or not 'password' in request.form:
+            return "Error not all fields are present", 400
+        email = request.form['email']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        cur.execute(f'''
+                    SELECT 
+                    * FROM user 
+                    WHERE email = '{email}' AND password = '{password}'
+                    ''')
+        rv = cur.fetchall()
+        cur.close()
+        if len(rv) == 0:
+            return "User doesn't exist", 400
+        return "User logged in", 200
+    return render_template("login.html")
+
+
+@app.route("/auth/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        if not request.form or not 'name' in request.form or not 'email' in request.form or not 'password' in request.form:
+            return "Error not all fields are present", 400
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        cur.execute(f'''
+                    SELECT 
+                    * FROM user 
+                    WHERE email = '{email}'
+                    ''')
+        rv = cur.fetchall()
+        if len(rv) > 0:
+            return "User already exists", 400
+        try:
+            cur.execute(f'''
+                        INSERT INTO user (name, email, password) 
+                        VALUES ('{name}', '{email}', '{password}')
+                        ''')
+            mysql.connection.commit()
+            cur.close()
+        except:
+            return "Internal server error", 500
+        return "User created", 201
+    return render_template("register.html")
+
+
 
 
 
