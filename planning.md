@@ -96,6 +96,7 @@ Los endpoints que se utilizarán son los siguientes:
 | `POST` | **/event** | Crea un evento | Evento |
 | `PUT` | **/event/{id}** | Edita un evento | Evento |
 | `DELETE` | **/event/{id}** | Elimina un evento | Evento |
+| `POST` | **/event/{id}?user={id}&status={accepted/rejected}** | Acepta o rechaza una invitación | Invitación |
 
 ### /user
 | Método | Endpoint | Descripción | Devuelve |
@@ -111,9 +112,7 @@ Los endpoints que se utilizarán son los siguientes:
 | :--- | :--- | :--- | :--- |
 | `GET` | **/event/{id}/guest** | Obtiene todos los invitados | Lista de invitados |
 | `POST` | **/event/{id}/guest** | Crea un invitado en un evento por su id | Invitado |
-| `PUT` | **/event/{id}/guest/{id}** | Edita un invitado específico | Invitado |
-| `PUT` | **/event/{id}/guest/{id}/accept** | Acepta un invitado específico | Invitado |
-| `PUT` | **/event/{id}/guest/{id}/reject** | Rechaza un invitado específico | Invitado |
+| `PUT` | **/guest/{id}** | Edita un invitado específico | Invitado |
 
 ### /product (*desire*)
 | Método | Endpoint | Descripción | Devuelve |
