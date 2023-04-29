@@ -44,3 +44,8 @@ hr.h-color{
     margin-left: 5px;
     box-shadow: 2px 2px 5px lightgrey;
 }
+.welcome{
+    font-size: 80px;
+    margin-left: 65px;
+}
+
