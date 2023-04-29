@@ -761,6 +761,10 @@ def register():
     return render_template("register.html")
 
 
+@app.route("/parties")
+def parties():
+    return render_template("parties.html")
+
 
 
 
