@@ -258,14 +258,15 @@ class EventList(Resource):
                 "name": ,
                 "date": ,
                 "location": ,
-                "limit of guests": ,
+                "limitGuests": ,
                 "budget": ,
-                "limit of budget": ,
+                "limitBudget": ,
                 "organizer": ,
-                "organizer name": ,
+                "organizerName": ,
                 "description": ,
                 "code": ,
-                "status":
+                "status":,
+                "guests": 
             }
         }
         """
@@ -294,14 +295,15 @@ class EventList(Resource):
                 'name': result[1],
                 'date': datetime.datetime.strftime(result[2], '%Y-%m-%d %H:%M'),
                 'location': result[3],
-                'limit of guests': result[4],
+                'limitGuests': result[4],
                 'budget': float(result[5]),
-                'limit of budget': float(result[6]),
+                'limitBudget': float(result[6]),
                 'organizer': result[12],
-                'organizer name': result[13],
+                'organizerName': result[13],
                 'description': result[8],
                 'code': result[9],
-                'status': result[10]
+                'status': result[10],
+                'guests': result[11]
             }
             json_data[result[0]] = d
         return json_data
@@ -316,7 +318,7 @@ class EventList(Resource):
             "location": ,
             "limitGuests": ,
             "limitBudget": ,
-            "organizer": ,
+            "organizer_id": ,
             "description":
         }
         JSON output: (same as input){
@@ -325,12 +327,12 @@ class EventList(Resource):
             "location": ,
             "limitGuests": ,
             "limitBudget": ,
-            "organizer": ,
+            "organizer_id": ,
             "description":
         }
         """
-        if not request.json or not 'name' in request.json or not 'date' in request.json or not 'location' in request.json or not 'limitGuests' in request.json or not 'limitBudget' in request.json or not 'organizer' in request.json or not 'description' in request.json:
-            return "Error not all fields are present", 400
+        if not request.json or not 'name' in request.json or not 'date' in request.json or not 'location' in request.json or not 'limitGuests' in request.json or not 'limitBudget' in request.json or not 'organizer_id' in request.json or not 'description' in request.json:
+            return "Error not all fields are present", 406
         code = make_code()
         cur = mysql.connection.cursor()
         cur.execute(f'''
@@ -351,17 +353,18 @@ class EventList(Resource):
             sql = f'''
                     INSERT INTO event (name, date, location, limitGuests, budget, limitBudget, organizer, description, code)
                     VALUES (
-                        "{request.json['name']}", 
-                        STR_TO_DATE("{request.json['date']}", "%Y-%m-%d %H:%i"), 
-                        "{request.json['location']}", 
-                        {request.json['limitGuests']}, 
+                        '{request.json["name"]}', 
+                        STR_TO_DATE('{request.json["date"]}', '%Y-%m-%d %H:%i'), 
+                        '{request.json["location"]}', 
+                        {request.json["limitGuests"]}, 
                         0, 
-                        {request.json['limitBudget']}, 
-                        {request.json['organizer']}, 
-                        "{request.json['description']}", 
-                        "{code}"
+                        {request.json["limitBudget"]}, 
+                        {request.json["organizer_id"]}, 
+                        '{request.json["description"]}', 
+                        '{code}'
                         )
                     '''
+            print(sql)
             cur.execute(sql)
             mysql.connection.commit()
             cur.close()
@@ -382,13 +385,14 @@ class Event(Resource):
             "name": ,
             "date": ,
             "location": ,
-            "limit of guests": ,
+            "limitGuests": ,
             "budget": ,
-            "limit of budget": ,
+            "limitBudget": ,
             "organizer": ,
             "description": ,
             "code": ,
-            "status":
+            "status":,
+            "guests":
         }
         """
         if type == 'active':
@@ -397,6 +401,8 @@ class Event(Resource):
                         SELECT * 
                         FROM event 
                         INNER JOIN user ON event.organizer = user.id AND event.status <> 1 AND event.id = {event_id}
+                        ORDER BY event.date ASC
+                        LIMIT 50
                         ''')
             rv = cur.fetchall()
             cur.close()
@@ -406,6 +412,8 @@ class Event(Resource):
                         SELECT * 
                         FROM event 
                         INNER JOIN user ON event.organizer = user.id AND event.id = {event_id}
+                        ORDER BY event.date ASC
+                        LIMIT 50
                         ''')
             rv = cur.fetchall()
             cur.close()
@@ -419,13 +427,14 @@ class Event(Resource):
                 'name': result[1],
                 'date': datetime.datetime.strftime(result[2], '%Y-%m-%d %H:%M'),
                 'location': result[3],
-                'limit of guests': result[4],
+                'limitGuests': result[4],
                 'budget': float(result[5]),
-                'limit of budget': float(result[6]),
+                'limitBudget': float(result[6]),
                 'organizer': result[12],
                 'description': result[8],
                 'code': result[9],
-                'status': result[10]
+                'status': result[10],
+                'guests': result[11]
             }
             json_data[result[0]] = d
             return json_data
@@ -543,9 +552,11 @@ class Event(Resource):
         rv = cur.fetchall()
         cur.close()
         if len(rv) == 0:
-            return "Event doesn't exist", 400
+            return "Event doesn't exist", 404
         if not request.args or not 'user' in request.args or not 'status' in request.args:
             return "Error not all fields must be present", 400
+        if rv[0][11] >= rv[0][4]:
+            return "Event is full", 405
         try:
             cur = mysql.connection.cursor()
             cur.execute(f'''
@@ -728,10 +739,10 @@ class Options(Resource):
                 json_data = {
                     'id': result[0],
                     'name': result[1],
-                    'date': result[2],
+                    'date': result[2].strftime("%Y-%m-%d %H:%M:%S"),
                     'location': result[3],
-                    'description': result[4],
-                    'user': result[5]
+                    'description': result[8],
+                    'user': result[7]
                 }
             elif request.args['table'] == 'guest':
                 json_data = {

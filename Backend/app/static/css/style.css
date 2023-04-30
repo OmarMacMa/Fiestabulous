@@ -49,3 +49,17 @@ hr.h-color{
     margin-left: 65px;
 }
 
+.fc-toolbar h2 {
+    font-size: 16px;
+    margin: 0;
+}
+
+.fc-basic-view .fc-body .fc-row {
+    min-height: 2em !important;
+}
+
+.fc-head {
+    background: rgba(0,0,0,.125);
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+}
