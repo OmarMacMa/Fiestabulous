@@ -34,7 +34,7 @@
                 <span class="bg-dark rounded pill text-white py-0 px-2">02</span>
                 </a>
                 </li>
-                <li class=""><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="far fa-question"></i>Help</a></li>
+                <li class=""><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="far fa-question"></i>New event</a></li>
             </ul>
             <hr class="h-color mx-2">
             <ul class="list-unstyled px-2">
@@ -42,7 +42,20 @@
                 <li class=""><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="fal fa-sign-out"></i>Logout</a></li>
             </ul>
         </div>
-        <div class="content" >         
+        <div class="content">
+            <table>
+                <tr>
+                    <td>
+                        <div class="input-group mb-3" style="width: 500px; overflow-y: auto; margin: 10px;">
+                            <button class="btn btn-outline-secondary" type="button" id="button-addon1">Code</button>
+                            <input type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                          </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-lg my-4" style="font-size: 18px; padding: 10px 30px; ">New party?</button>
+                    </td>
+                </tr>
+            </table>
           <div class="card border-0 rounded-5 shadow" style="width: 900px; margin-left: 65px; margin-top: 10px;">
             <div class="card-header bg-secondary text-white rounded-5">
               <h5 class="mb-0">Eventos</h5>
@@ -82,6 +95,7 @@
             });
 
     </script>
+  </div>
 </body>
 
 </html>
