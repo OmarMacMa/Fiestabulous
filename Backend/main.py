@@ -8,21 +8,6 @@ from app import create_app
 
 app, api, mysql = create_app()
 
-PET = {
-    'pet1': {'name': 'Cacho', 'age': 11, 'animal': 'dog'},
-    'pet2': {'name': 'Percy', 'age': 2, 'animal': 'cat'},
-    'pet3': {'name': 'Perla', 'age': 5, 'animal': 'cat'},
-    'pet4': {'name': 'Cloe', 'age': 1, 'animal': 'cat'}
-}
-
-def abort_if_pet_doesnt_exist(pet_id):
-    if pet_id not in PET:
-        abort(404, message="Pet {} doesn't exist".format(pet_id))
-
-
-parser = reqparse.RequestParser()
-parser.add_argument('name')
-
 
 def make_code():
     digits = string.digits
@@ -38,33 +23,6 @@ def make_code():
     password = ''.join(password_list)
 
     return password
-
-class Pet(Resource):
-    def get(self, pet_id):
-        abort_if_pet_doesnt_exist(pet_id)
-        return PET[pet_id]
-
-    def delete(self, pet_id):
-        abort_if_pet_doesnt_exist(pet_id)
-        del PET[pet_id]
-        return '', 204
-    
-    def put(self, pet_id):
-        args = parser.parse_args()
-        name = {'name': args['name']}
-        PET[pet_id] = {**PET[pet_id], **name}
-        return name, 201
-
-class PetList(Resource):
-    def get(self):
-        return PET
-
-    def post(self):
-        args = parser.parse_args()
-        pet_id = int(max(PET.keys()).lstrip('pet')) + 1
-        pet_id = 'pet%i' % pet_id
-        PET[pet_id] = {'name': args['name'], 'age': args['age'], 'animal': args['animal']}
-        return PET[pet_id], 201
 
 
 class UserList(Resource):
@@ -803,10 +761,6 @@ def party_admin(event_id):
     return render_template("organizer.html", event_id=event_id)
 
 
-
-
-api.add_resource(Pet, '/pet/<pet_id>')
-api.add_resource(PetList, '/pet')
 api.add_resource(UserList, '/api/user')
 api.add_resource(User, '/api/user/<user_id>')
 api.add_resource(EventList, '/api/event/')
