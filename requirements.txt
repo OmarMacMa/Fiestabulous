@@ -3,3 +3,4 @@ flask-restful
 flask_mysqldb
 mysqlclient
 flask_cors
+gunicorn

@@ -5,14 +5,6 @@ from flask import Flask, request, jsonify, render_template
 from flask_restful import Resource, Api, reqparse, abort
 from app import create_app
 
-# app = Flask(__name__)
-# api = Api(app)
-# app.config["MYSQL_HOST"] = MYSQL_HOST
-# app.config["MYSQL_USER"] = MYSQL_USER
-# app.config["MYSQL_PASSWORD"] = MYSQL_PASSWORD
-# app.config["MYSQL_DB"] = MYSQL_DB
-
-# mysql = MySQL(app)
 
 app, api, mysql = create_app()
 
