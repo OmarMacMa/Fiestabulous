@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+
+  <title>Organizer</title>
+</head>
+
+<body>
+  <div class="main-container d-flex">
+    <div class="sidebar" id="side_nav">
+      <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
+        <a href="/" class="text-decoration-none">
+        <h1 class="fs-4"><span class="bg-white text-dark rounded shadow px-2 me-2"><i class="far fa-democrat"></i></span> <span class="text-white">Fiestabulous</span></h1>
+        </a>
+      </div>
+      <ul class="list-unstyled px-2">
+        <li class=""><a href="/" class="text-decoration-none px-3 py-2 d-block"><i class="fal fa-home"></i></i>Dashboard</a></li>
+        <li class="active"><a href="/parties" class="text-decoration-none px-3 py-2 d-block"><i class="far fa-hat-wizard fa-spin"></i> Parties</a></li>
+        <li class="" hidden><a href="#" class="text-decoration-none px-3 py-2 d-block d-flex justify-content-between">
+        <span><i class="far fa-user-friends"></i>Friends</span>
+        <span class="bg-dark rounded pill text-white py-0 px-2">02</span>
+        </a>
+        </li>
+        <li class="" hidden><a href="/new_party" class="text-decoration-none px-3 py-2 d-block"><i class="far fa-question"></i>New party</a></li>
+      </ul>
+      <hr class="h-color mx-2">
+      <ul class="list-unstyled px-2">
+        <li class="" hidden><a href="#" class="text-decoration-none px-3 py-2 d-block"><i class="far fa-cog"></i>Settings</a></li>
+        <li class="" id="LogOut"><a href="/auth/login" class="text-decoration-none px-3 py-2 d-block"><i class="fal fa-sign-out"></i> Logout</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      <div class="card border-0 rounded-5 shadow" style="display:flex; align-items:center; margin:30px;">
+        <div class="card-header bg-secondary text-white rounded-5" style="width: 100%;">
+          <h5 class="mb-0">Party info</h5>
+        </div>
+        <div class="card-body" style="height: auto;">
+        <div style="display: flex; flex-wrap: wrap;">
+          <div style="flex: 40%; padding: 10px;">
+            <h1 id="event-name" style="font-size: 50px; color: #2c2d50;"
+            ><b></b></h1>
+            <br>
+            <h3 id="event-description"></h3>
+            <span style="font-size: 20px; "><i class="fal fa-money-bill-wave"></i> Budget limit:  </span>
+            <h5 id="event-budget-limit" style="display: inline-block;"></h5>
+            <!-- <span style="font-size: 20px; "><i class="fal fa-money-bill-wave"></i> Current budget:  </span>
+            <h5 id="event-current-budget" style="display: inline-block;"></h5> -->
+            <br>
+            <span style="font-size: 20px; "><i class="fal fa-users"></i> Limit of guests:  </span>
+            <h5 id="event-guests-limit" style="display: inline-block;"></h5>
+            <br>
+            <span style="font-size: 20px; "><i class="fal fa-user-friends"></i> Current guests:  </span>
+            <h5 id="event-current-guests" style="display: inline-block;"></h5>
+            <br>
+            <span style="font-size: 20px; "><i class="fal fa-calendar-alt"></i> Hour:  </span>
+            <h5 id="event-hour" style="display: inline-block;"></h5>
+            <br>
+            <span style="font-size: 20px; "><i class="fal fa-qrcode"></i> Sharable code:  </span>
+            <h5 id="event-code" style="display: inline-block;"></h5>
+            <div class="card border-0 rounded-5 shadow" style="width: 300px; margin-left: 5px; margin-top: 25px;">
+            <div class="card-body" style="height: 200px; overflow-y: auto;">
+              <ul id="guests-list" style="font-size: 20px">
+              </ul>
+            </div>
+            </div>
+          </div>
+          <div style="flex: 60%; padding: 10px;">
+            <div id="calendar"></div>
+            <br>
+            <div id="event-map"></div>
+            <br>
+          </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>       
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/functions.js') }}"></script>
+  <script>
+    const path = window.location.pathname;
+    const pathArray = path.split('/');
+    const event_id = pathArray[pathArray.length - 1];
+
+    const getEvent = async() => {
+      const response = await fetch(`/api/event/${event_id}`);
+      const data = await response.json();
+      return data;
+    }
+    getEvent().then(response => {
+      for ([key, value] of Object.entries(response)) {
+        if (value.organizer == window.localStorage.getItem('user_id')) {
+          window.location.href = "/party_admin/" + event_id;
+          break;
+          
+        }
+        date = value.date.split(" ")[0];
+        hour = value.date.split(" ")[1];
+        $('#event-name').text(value.name);
+        $('#event-description').text(value.description);
+        $('#event-budget-limit').text(`$${value.limitBudget}`);
+        // $('#event-current-budget').text(`$${value.budget}`);
+        $('#event-guests-limit').text(value.limitGuests);
+        $('#event-current-guests').text(value.guests);
+        $('#event-hour').text(`${hour}`);
+        $('#event-code').text(`${value.code}`);
+        $('#event-map').append(`<iframe src="https://maps.google.com/maps?${value.location}&z=12&output=embed" width="100%" height="100%" allowfullscreen="" zoom="18"></iframe>`)
+        $('#calendar').fullCalendar({
+          header: {
+            left: '',
+            center: 'title',
+            right: ''
+          },
+          height: 300,
+          defaultView: 'month',
+          weekends: true,
+          editable: false,
+          selectable: false,
+          eventLimit: true,
+          defaultDate: date,
+          events: [
+          {
+            start: date,
+            title: value.name,
+          } 
+          ]
+        });
+      }
+    });
+
+    const getGuests = async() => {
+      const response = await fetch(`/api/event/${event_id}/guest`);
+      const data = await response.json();
+      return data;
+    }
+    getGuests().then(response => {
+      $('#guests-list').empty();
+      for ([key, value] of Object.entries(response)) {
+        $('#guests-list').append(`<li>${value.name} is ${value.status}</li>`);
+      }
+    });
+
+    $(".sidebar ul li").on('click', function(){
+      $(".sidebar ul li.active").removeClass('active');
+      $(this).addClass('active');
+    });
+
+    $('.open-btn').on('click', function(){
+      $('.sidebar').addClass('active');
+    });
+
+    $('.close-btn').on('click', function(){
+      $('.sidebar').removeClass('active');
+    });
+  </script>
+</body>
+
+</html>
