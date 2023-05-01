@@ -15,6 +15,5 @@ def create_app():
     app.config['MYSQL_PASSWORD'] = MYSQL_PASSWORD
     app.config['MYSQL_DB'] = MYSQL_DB
     app.config["ssl_ca"] = "./DigiCertGlobalRootCA.crt.pem"
-    # app.config["client_flags"] = [mysql.connector.ClientFlag.SSL]
     CORS(app)
     return app, api, mysql

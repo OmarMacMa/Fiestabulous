@@ -46,13 +46,15 @@
     <div class="content">
       <div style="display: flex; justify-content: center; align-items: center;">
         <div class="row" style="display: flex; justify-content: space-between; width: 100%; margin: 10px; align-items: center;">
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Insert party code" aria-label="Example text with button addon" aria-describedby="button-addon1" id="partyCode">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon1" onclick="enrollParty()"><i class="fas fa-qrcode"></i> Enroll party</button>
+          <div class="col-md-6">
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="Insert party code" aria-label="Example text with button addon" aria-describedby="button-addon1" id="partyCode">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon1" onclick="enrollParty()"><i class="fas fa-qrcode"></i> Enroll party</button>
+            </div>
           </div>
-        </div>
-        <div class="row" style="display: flex; justify-content: space-between; width: 100%; margin: 10px; align-items: center;">
-          <button type="button" class="btn btn-success btn-lg my-4" style="font-size: 18px;" data-bs-toggle="modal" data-bs-target="#createPartyModal">New party?</button>
+          <div class="col-md-6">
+            <button type="button" class="btn btn-success btn-lg my-4" style="font-size: 18px; width: 100%;" data-bs-toggle="modal" data-bs-target="#createPartyModal">New party?</button>
+          </div>
         </div>
       </div>
       
@@ -128,7 +130,7 @@
   
   <script>
     getParties = async () => {
-      const response = await fetch("http://127.0.0.1:5000/api/event/?type=active", {
+      const response = await fetch("https://fiestabulous.herokuapp.com//api/event/?type=active", {
         method: "GET",
         headers: {
           "Content-Type": "application/json"

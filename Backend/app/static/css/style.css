@@ -59,3 +59,9 @@ hr.h-color{
     border-bottom: 1px solid #ddd;
     font-size: 12px;
 }
+.img-fluid {
+    max-height: 200px;
+    max-width: 400px;
+    height: auto;
+    width: 100%;
+}
