@@ -54,10 +54,6 @@ hr.h-color{
     margin: 0;
 }
 
-.fc-basic-view .fc-body .fc-row {
-    min-height: 2em !important;
-}
-
 .fc-head {
     background: rgba(0,0,0,.125);
     border-bottom: 1px solid #ddd;

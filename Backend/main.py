@@ -364,7 +364,6 @@ class EventList(Resource):
                         '{code}'
                         )
                     '''
-            print(sql)
             cur.execute(sql)
             mysql.connection.commit()
             cur.close()
@@ -417,7 +416,6 @@ class Event(Resource):
                         ''')
             rv = cur.fetchall()
             cur.close()
-            print(rv)
             if len(rv) == 0:
                 return "Event doesn't exist", 400
         json_data = {}
@@ -471,8 +469,9 @@ class Event(Resource):
         rv = cur.fetchall()
         cur.close()
         if len(rv) == 0:
-            return "Event doesn't exist", 400
+            return "Event doesn't exist", 404
         if not request.json or (not 'name' in request.json and not 'date' in request.json and not 'location' in request.json and not 'limitGuests' in request.json and not 'limitBudget' in request.json and not 'description' in request.json and not 'status' in request.json):
+            print(request.json)
             return "Error not at least one field must be present", 400
         try:
             query = f'''UPDATE event SET '''
@@ -493,6 +492,7 @@ class Event(Resource):
                 update.append(f'''status = {request.json['status']}''')
             query += ', '.join(update)
             query += f''' WHERE id = {event_id}'''
+            print(query)
             cur = mysql.connection.cursor()
             cur.execute(query)
             mysql.connection.commit()
@@ -602,7 +602,7 @@ class GuestList(Resource):
             d = {
                 'id': result[0],
                 'name': result[1],
-                'status': "Going" if result[3] == 1 else ("Pending" if result[3] == 0 else "Not going"),
+                'status': "going" if result[3] == 1 else ("pending to confirm" if result[3] == 0 else "not going"),
                 'event': result[4]
             }
             json_data[result[0]] = d
@@ -611,21 +611,40 @@ class GuestList(Resource):
     def post(self, event_id):
         """
         Add a guest to a specific event
-        URL: /guest/<event_id>/guest
+        URL: /event/<event_id>/guest
         JSON input: {
             "user": 
+            "status": (0, 1, 2)
         }
         JSON output: {
             "user": 
+            "status":
         }
         """
-        if not request.json or not 'user' in request.json:
+        if not request.json or not 'user' in request.json or not 'status' in request.json:
             return "Error not all fields are present", 400
         try:
             cur = mysql.connection.cursor()
             cur.execute(f'''
-                        INSERT INTO guest (user, event) 
-                        VALUES ({request.json['user']}, {event_id})
+                        INSERT INTO guest (user, event, status) 
+                        VALUES ({request.json['user']}, {event_id}, {request.json['status']})
+                        ''')
+            mysql.connection.commit()
+            cur.close()
+            cur = mysql.connection.cursor()
+            cur.execute(f'''
+                        SELECT *
+                        FROM event
+                        WHERE id = {event_id}
+                        ''')
+            rv = cur.fetchall()
+            cur.close()
+            guests = rv[0][11]
+            cur = mysql.connection.cursor()
+            cur.execute(f'''
+                        UPDATE event
+                        SET guests = {guests + 1}
+                        WHERE id = {event_id}
                         ''')
             mysql.connection.commit()
             cur.close()
@@ -776,6 +795,20 @@ def register():
 def parties():
     return render_template("parties.html")
 
+
+@app.route("/new_party")
+def new_party():
+    return render_template("new_event.html")
+
+
+@app.route("/party/<event_id>")
+def party(event_id):
+    return render_template("invited.html", event_id=event_id)
+
+
+@app.route("/party_admin/<event_id>")
+def party_admin(event_id):
+    return render_template("organizer.html", event_id=event_id)
 
 
 

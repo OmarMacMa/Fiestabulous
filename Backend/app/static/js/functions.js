@@ -35,6 +35,12 @@ function error406() {
 }
 
 
+$("#LogOut").on('click', function(){
+    localStorage.clear();
+    window.location.href = "/";
+});
+
+
 function postUser() {
     event.preventDefault();
     var name = $("#userName").val();
@@ -203,12 +209,152 @@ function createParty() {
             };
             getPartyByName().then(response => {
                 if (response) {
-                    // window.location.href = "http://127.0.0.1:5000/party/" + response.id;
+                    window.location.href = "http://127.0.0.1:5000/party_admin/" + response.id;
                     return response;
                 }else {
                     return;
                 }
             });
+        }
+    });
+}
+
+$("#createPartyModal").on("click", function() {
+    tomorrow = moment().add(1, 'days').format("YYYY-MM-DDTHH:mm");
+    $("#date").prop("min", tomorrow);
+    $("#organizer_id").val(localStorage.getItem("user_id"));
+    $("#organizer").val(localStorage.getItem("user_name"));
+});
+
+$(document).ready(function(){
+    var excludedUrls = ["/auth/login", "/auth/register"];
+    var currentUrl = window.location.pathname;
+    if (localStorage.getItem("user_name") == null && !excludedUrls.includes(currentUrl)) {
+        window.location.href = "/auth/login";
+    }
+});
+
+function editBudgetLimit(){
+    var newBudgetLimit = $("#newBudgetLimit").val();
+    var eventID = $("#party-id-budget").val();
+    console.log(newBudgetLimit);
+    console.log(eventID);
+    if (newBudgetLimit == "" || eventID == "") {
+        error406();
+        return;
+    }
+    var requestBody = {
+        "limitBudget": newBudgetLimit
+    };
+    console.log(requestBody);
+    fetch("http://127.0.0.1:5000/api/event/" + eventID, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    });
+    Swal.fire({
+        title: "Success!",
+        text: "Budget limit updated!",
+        icon: "success",
+    });
+    setTimeout(function() {
+        window.location.href = "http://127.0.0.1:5000/party_admin/" + eventID;
+    }, 2000);
+    return;
+}
+
+function editGuestsLimit(){
+    var newGuestLimit = $("#newGuestLimit").val();
+    var eventID = $("#party-id-guests").val();
+    if (newGuestLimit == "" || eventID == "") {
+        error406();
+        return;
+    }
+    var requestBody = {
+        "limitGuests": newGuestLimit
+    };
+    fetch("http://127.0.0.1:5000/api/event/" + eventID, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(requestBody)
+    });
+    Swal.fire({
+        title: "Success!",
+        text: "Guests limit updated!",
+        icon: "success",
+    });
+    setTimeout(function() {
+        window.location.href = "http://127.0.0.1:5000/party_admin/" + eventID;
+    }, 2000);
+    return;
+}
+
+function eraseParty(){
+    var confimation = $("#confirm").val();
+    var eventID = $("#party-id-erase").val();
+    if (confimation == "" || eventID == "") {
+        error406();
+        return;
+    }
+    if (confimation == "erase") {
+        fetch("http://127.0.0.1:5000/api/event/" + eventID, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+        window.location.href = "http://127.0.0.1:5000/parties";
+        return;
+    }
+}
+
+function enrollParty(){
+    var userID = localStorage.getItem("user_id");
+    var partyCode = $("#partyCode").val();
+    if (userID == "" || partyCode == "") {
+        error406();
+        return;
+    }
+    getPartyByCode = async () => {
+        const response = await fetch("http://127.0.0.1:5000/api/options?table=event&field=code&value=" + partyCode, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        });
+        const data = await response.json();
+        return data;
+    };
+    getPartyByCode().then(response => {
+        if (response) {
+            var partyID = response.id;
+            var requestBody = {
+                "user": userID,
+                "status": 1
+            };
+            fetch("http://127.0.0.1:5000/api/event/" + partyID + "/guest", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestBody)
+            });
+            Swal.fire({
+                title: "Success!",
+                text: "You have been enrolled to the " + response.name + " party!",
+                icon: "success",
+            });
+            setTimeout(function() {
+                window.location.href = "http://127.0.0.1:5000/party/" + partyID;
+            }, 2000);
+            return;
+        }else {
+            error404();
+            return;
         }
     });
 }
