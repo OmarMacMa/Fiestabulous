@@ -73,7 +73,7 @@ The frontend is developed using HTML, CSS, JavaScript, Bootstrap and JQuery. The
 - `/party_admin/<party_id>`: Party admin page
 
 ## How to use it
-To use it you need to access the following link: [https://fiestabulous.azurewebsites.net/](https://fiestabulous.azurewebsites.net/) and create an account. Once you have an account you can create your own parties or enroll for other parties you find interesting.
+To use it you need to access the following link: [https://fiestabulous.herokuapp.com/](https://fiestabulous.herokuapp.com/) and create an account. Once you have an account you can create your own parties or enroll for other parties you find interesting.
 
 ## Authors
 - [Johan Cabrera](https://github.com/PAPIPHOX)
